@@ -62,6 +62,8 @@ following parameters are recognized:
 * MetricSeparator - If present, will change the default behavior of inserting
   a "." within type and type_instances. This can be used to prevent deep
   paths in Graphite/carbon for IPs and hostnames.
+* StripSingleMetric - If present, metrics with a single value will have
+  ".value" stripped from the end of the metric name.
 
 ## Example
 

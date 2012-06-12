@@ -29,6 +29,7 @@ types = {}
 postfix = None
 host_separator = "_"
 metric_separator = "."
+strip_single_metric = False
 
 def carbon_parse_types_file(path):
     global types
@@ -88,7 +89,7 @@ def sanitize_field(field):
 def carbon_config(c):
     global host, port, differentiate_values, differentiate_values_over_time, \
             prefix, postfix, host_separator, metric_separator, \
-            lowercase_metric_names
+            lowercase_metric_names, strip_single_metric
 
     for child in c.children:
         if child.key == 'LineReceiverHost':
@@ -116,6 +117,8 @@ def carbon_config(c):
             host_separator = child.values[0]
         elif child.key == 'MetricSeparator':
             metric_separator = child.values[0]
+        elif child.key == 'StripSingleMetric':
+            strip_single_metric = True
 
     if not host:
         raise Exception('LineReceiverHost not defined')
@@ -231,7 +234,10 @@ def carbon_write(v, data=None):
         ds_type = v_type[i][1]
 
         path_fields = metric_fields[:]
-        path_fields.append(ds_name)
+
+        # Strip trailing ".value" from single-value metrics
+        if (strip_single_metric == False) or (len(v.values) > 1):
+            path_fields.append(ds_name)
 
         metric = '.'.join(path_fields)
 
